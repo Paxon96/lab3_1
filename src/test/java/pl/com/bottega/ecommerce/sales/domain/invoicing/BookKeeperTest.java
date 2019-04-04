@@ -73,4 +73,12 @@ public class BookKeeperTest {
 
         verify(taxPolicy,times(0)).calculateTax(Mockito.any(), Mockito.any());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invoiceRequestWithTwoItemInvokingCalculateTaxMethodTTest(){
+        invoiceRequest.add(new RequestItem(productData,1,new Money(2,"PL")));
+        invoiceRequest.add(new RequestItem(productData,2,new Money(3)));
+
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+    }
 }
