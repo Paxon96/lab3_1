@@ -3,6 +3,7 @@ package pl.com.bottega.ecommerce.sales.domain.invoicing;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductData;
@@ -47,5 +48,15 @@ public class BookKeeperTest {
         Invoice invoice = bookKeeper.issuance(invoiceRequest,taxPolicy);
 
         Assert.assertThat(invoice.getItems().size(),is(equalTo(1)));
+    }
+
+    @Test
+    public void invoiceRequestWithTwoItemInvokingCalculateTaxMethodTwiceTest(){
+        invoiceRequest.add(new RequestItem(productData,1,new Money(2)));
+        invoiceRequest.add(new RequestItem(productData,2,new Money(3)));
+
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+
+        verify(taxPolicy, times(2)).calculateTax(Mockito.any(), Mockito.any());
     }
 }
