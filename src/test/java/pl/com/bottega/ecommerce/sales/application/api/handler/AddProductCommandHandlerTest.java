@@ -29,12 +29,18 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class AddProductCommandHandlerTest {
 
-    @InjectMocks private AddProductCommandHandler addProductCommandHandler;
-    @Mock private ReservationRepository reservationRepository;
-    @Mock private ProductRepository productRepository;
-    @Mock private SuggestionService suggestionService;
-    @Mock private ClientRepository clientRepository;
-    @Mock private SystemContext systemContext;
+    @InjectMocks
+    private AddProductCommandHandler addProductCommandHandler;
+    @Mock
+    private ReservationRepository reservationRepository;
+    @Mock
+    private ProductRepository productRepository;
+    @Mock
+    private SuggestionService suggestionService;
+    @Mock
+    private ClientRepository clientRepository;
+    @Mock
+    private SystemContext systemContext;
 
     private Reservation reservation;
     private Product product;
@@ -76,5 +82,12 @@ public class AddProductCommandHandlerTest {
 
         addProductCommandHandler.handle(new AddProductCommand(Id.generate(), Id.generate(), 1));
         verify(suggestionService, times(1)).suggestEquivalent(any(Product.class), any(Client.class));
+    }
+
+    @Test
+    public void addProductShouldLoadProductFromRepoTest(){
+        addProductCommandHandler.handle(new AddProductCommand(Id.generate(), Id.generate(), 1));
+
+        verify(productRepository, times(1)).load(any(Id.class));
     }
 }
