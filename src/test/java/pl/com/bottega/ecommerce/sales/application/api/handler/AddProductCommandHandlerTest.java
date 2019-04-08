@@ -90,4 +90,11 @@ public class AddProductCommandHandlerTest {
 
         verify(productRepository, times(1)).load(any(Id.class));
     }
+
+    @Test
+    public void addProductShouldSaveReservationTest() {
+        addProductCommandHandler.handle(new AddProductCommand(Id.generate(), Id.generate(), 1));
+
+        verify(reservationRepository, times(1)).save(any(Reservation.class));
+    }
 }
