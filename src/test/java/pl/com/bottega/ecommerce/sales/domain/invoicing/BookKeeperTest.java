@@ -6,11 +6,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
+import pl.com.bottega.ecommerce.sales.domain.productscatalog.Product;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductData;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
-
-import java.util.Date;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.*;
@@ -31,13 +30,14 @@ public class BookKeeperTest {
     public void init() {
         invoiceFactory = mock(InvoiceFactory.class);
         bookKeeper = new BookKeeper(new InvoiceFactory());
-        productData = new ProductData(Id.generate(), new Money(1), "Temp", ProductType.FOOD, new Date());
+        Product product = new Product(Id.generate(), new Money(1), "Temp", ProductType.FOOD);
+        productData = product.generateSnapshot();
         clientData = new ClientData(Id.generate(), "Kowalski");
         invoiceRequest = new InvoiceRequest(clientData);
         taxPolicy = mock(TaxPolicy.class);
 
 
-        when(invoiceFactory.create(any(ClientData.class))).thenReturn(new Invoice(Id.generate(), new ClientData(Id.generate(), "Temp")));
+        when(invoiceFactory.create(any(ClientData.class))).thenReturn(new Invoice(Id.generate(), clientData));
         when(taxPolicy.calculateTax(any(ProductType.class), any(Money.class))).thenReturn(new Tax(new Money(1),"TaxTest"));
     }
 
@@ -76,7 +76,7 @@ public class BookKeeperTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invoiceRequestWithTwoItemInvokingCalculateTaxMethodTTest(){
+    public void invoiceRequestWithTwoItemInvokingCalculateTaxMethodTest(){
         invoiceRequest.add(new RequestItem(productData,1,new Money(2,"PL")));
         invoiceRequest.add(new RequestItem(productData,2,new Money(3)));
 
@@ -84,7 +84,7 @@ public class BookKeeperTest {
     }
 
     @Test
-    public void invoiceRequestShouldHaveGivenClientData(){
+    public void invoiceRequestShouldHaveGivenClientDataTest(){
         Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
         Assert.assertThat(invoice.getClient(),equalTo(clientData));
     }
