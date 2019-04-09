@@ -30,8 +30,9 @@ public class BookKeeperTest {
     @Before
     public void init() {
         invoiceFactory = mock(InvoiceFactory.class);
-        bookKeeper = new BookKeeper(invoiceFactory);
+        bookKeeper = new BookKeeper(new InvoiceFactory());
         productData = new ProductData(Id.generate(), new Money(1), "Temp", ProductType.FOOD, new Date());
+        clientData = new ClientData(Id.generate(), "Kowalski");
         invoiceRequest = new InvoiceRequest(clientData);
         taxPolicy = mock(TaxPolicy.class);
 
@@ -80,5 +81,11 @@ public class BookKeeperTest {
         invoiceRequest.add(new RequestItem(productData,2,new Money(3)));
 
         bookKeeper.issuance(invoiceRequest, taxPolicy);
+    }
+
+    @Test
+    public void invoiceRequestShouldHaveGivenClientData(){
+        Invoice invoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+        Assert.assertThat(invoice.getClient(),equalTo(clientData));
     }
 }
